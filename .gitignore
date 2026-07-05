@@ -1,2 +1,4 @@
 __pycache__
 .pyc
+s3d_floorplan_eval/montefloor_data/
+weights

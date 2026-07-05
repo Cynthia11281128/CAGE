@@ -450,7 +450,7 @@ def evaluate_floor(model, dataset_name, data_loader, device, output_dir, plot_pr
             cv2.imwrite(os.path.join(output_dir, '{}_pred_edge.png'.format(scene_ids[i])), edge_map)
             density_map = np.transpose((samples[i] * 255).cpu().numpy(), [1, 2, 0])
             density_map = np.repeat(density_map, 3, axis=2)
-            pred_room_map = np.zeros([256, 256, 3])
+            pred_room_map = np.zeros([256, 256, 3], dtype=np.uint8)
 
             for room_poly in room_edges:
                 pred_room_map = plot_room_map_with_edges(room_poly, pred_room_map)
@@ -459,13 +459,13 @@ def evaluate_floor(model, dataset_name, data_loader, device, output_dir, plot_pr
             if plot_density:
                 density_map = np.transpose((samples[i] * 255).cpu().numpy(), [1, 2, 0])
                 density_map = np.repeat(density_map, 3, axis=2)
-                pred_room_map = np.zeros([256, 256, 3])
+                pred_room_map = np.zeros([256, 256, 3], dtype=np.uint8)
 
                 for room_poly in room_polys:
                     pred_room_map = plot_room_map(room_poly, pred_room_map)
 
                 # plot predicted polygon overlaid on the density map
-                pred_room_map = np.clip(pred_room_map + density_map, 0, 255)
+                pred_room_map = np.clip(pred_room_map + density_map, 0, 255).astype(np.uint8)
                 cv2.imwrite(os.path.join(output_dir, '{}_pred_room_map.png'.format(scene_ids[i])), pred_room_map)
 
     for k in quant_result_dict.keys():
@@ -486,5 +486,5 @@ def evaluate_floor(model, dataset_name, data_loader, device, output_dir, plot_pr
     avg_time = sum(time_all) / len(time_all)
     print(f"Average inference time: {avg_time:.2f} ms")
 
-    with open(os.path.join(output_dir, 'results.txt'), 'w') as file:
+    with open(os.path.join(output_dir, 'results.json'), 'w') as file:
         file.write(json.dumps(quant_result_dict))
